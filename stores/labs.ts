@@ -132,9 +132,9 @@ export const useLabsStore = defineStore('labs', {
           method: 'DELETE'
         })
         
-        const sessionIndex = this.sessions.findIndex(s => s.id === sessionId)
-        if (sessionIndex !== -1) {
-          this.sessions[sessionIndex].status = 'stopped'
+        const session = this.sessions.find(s => s.id === sessionId)
+        if (session) {
+          session.status = 'stopped'
         }
         
         if (this.currentSession?.id === sessionId) {

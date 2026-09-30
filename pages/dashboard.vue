@@ -60,7 +60,7 @@
             <p class="text-gray-600">Active Sessions</p>
           </div>
         </div>
-        <div class="mt-4" v-if="labsStore.activeSessions.length > 0">
+        <div class="mt-4" v-if="labsStore.activeSessions[0]">
           <NuxtLink 
             :to="`/workspace/${labsStore.activeSessions[0].id}`" 
             class="text-yellow-600 hover:text-yellow-500 font-medium"
