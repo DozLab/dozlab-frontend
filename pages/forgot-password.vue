@@ -106,8 +106,8 @@ const handleReset = async () => {
   isLoading.value = true
   
   try {
-    // TODO: Implement actual API call for password reset
-    await $fetch('/api/auth/forgot-password', {
+    // TODO: the API has no password reset route yet
+    await useApi()('/auth/forgot-password', {
       method: 'POST',
       body: { email: form.email }
     })

@@ -1,6 +1,7 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Tailwind 4 (from @nuxt/ui 3); @config keeps the colors and fonts in tailwind.config.js */
+@import "tailwindcss";
+@import "@nuxt/ui";
+@config "../../tailwind.config.js";
 
 @layer base {
   body {

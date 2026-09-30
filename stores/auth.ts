@@ -40,19 +40,18 @@ export const useAuthStore = defineStore('auth', {
     async login(credentials: { username: string; password: string }) {
       this.isLoading = true
       try {
-        // TODO: Implement actual API call
-        const response = await $fetch('/api/auth/login', {
+        const response = await useApi()<{ user: User, tokens: { access_token: string } }>('/auth/login', {
           method: 'POST',
           body: credentials
         })
-        
-        this.token = response.token
+
+        this.token = response.tokens.access_token
         this.user = response.user
         this.isAuthenticated = true
-        
+
         // Store token in cookie for persistence
         const tokenCookie = useCookie('auth-token')
-        tokenCookie.value = response.token
+        tokenCookie.value = this.token
         
         return response
       } catch (error) {
@@ -71,8 +70,7 @@ export const useAuthStore = defineStore('auth', {
     }) {
       this.isLoading = true
       try {
-        // TODO: Implement actual API call
-        const response = await $fetch('/api/auth/register', {
+        const response = await useApi()('/auth/register', {
           method: 'POST',
           body: userData
         })
@@ -102,13 +100,8 @@ export const useAuthStore = defineStore('auth', {
       if (!this.token) return
       
       try {
-        // TODO: Implement actual API call
-        const user = await $fetch('/api/auth/me', {
-          headers: {
-            Authorization: `Bearer ${this.token}`
-          }
-        })
-        
+        const { user } = await useApi()<{ user: User }>('/users/profile')
+
         this.user = user
         this.isAuthenticated = true
       } catch (error) {
