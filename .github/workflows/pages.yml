@@ -1,0 +1,49 @@
+# Builds the static site and deploys it to GitHub Pages:
+# https://dozlab.github.io/dozlab-frontend/ (dozlab-api docs/decision.md, "frontend on GitHub Pages").
+# Set the repo variable API_BASE_URL to the backend's public URL, e.g.
+# https://dozmanlab.taildc994d.ts.net/api/v1
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx nuxt generate
+        env:
+          NUXT_APP_BASE_URL: /${{ github.event.repository.name }}/
+          API_BASE_URL: ${{ vars.API_BASE_URL }}
+      # nuxt generate (ssr: false) writes 404.html as the SPA shell, so deep links
+      # such as /workspace/<id> load the app on Pages
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .output/public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

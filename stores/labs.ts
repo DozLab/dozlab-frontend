@@ -78,8 +78,7 @@ export const useLabsStore = defineStore('labs', {
     async fetchLabs() {
       this.isLoading = true
       try {
-        // TODO: Implement actual API call
-        const labs = await $fetch('/api/labs')
+        const { labs } = await useApi()<{ labs: Lab[] }>('/labs/')
         this.labs = labs
       } catch (error) {
         console.error('Failed to fetch labs:', error)
@@ -92,8 +91,7 @@ export const useLabsStore = defineStore('labs', {
     async fetchSessions() {
       this.isLoading = true
       try {
-        // TODO: Implement actual API call
-        const sessions = await $fetch('/api/sessions')
+        const { sessions } = await useApi()<{ sessions: LabSession[] }>('/lab-sessions/')
         this.sessions = sessions
       } catch (error) {
         console.error('Failed to fetch sessions:', error)
@@ -106,12 +104,17 @@ export const useLabsStore = defineStore('labs', {
     async createSession(labId: string) {
       this.isLoading = true
       try {
-        // TODO: Implement actual API call
-        const session = await $fetch('/api/sessions', {
+        // The API starts the session and answers 202 before it's running
+        const { session, credentials } = await useApi()<{
+          session: LabSession
+          credentials: { vscode_password: string }
+        }>('/lab-sessions/', {
           method: 'POST',
-          body: { labId }
+          body: { lab_id: labId }
         })
-        
+        // The API returns the password only here; the workspace page shows it
+        useState(`vscode-password-${session.id}`).value = credentials.vscode_password
+
         this.sessions.push(session)
         this.currentSession = session
         return session
@@ -125,9 +128,8 @@ export const useLabsStore = defineStore('labs', {
 
     async stopSession(sessionId: string) {
       try {
-        // TODO: Implement actual API call
-        await $fetch(`/api/sessions/${sessionId}/stop`, {
-          method: 'POST'
+        await useApi()(`/lab-sessions/${sessionId}`, {
+          method: 'DELETE'
         })
         
         const sessionIndex = this.sessions.findIndex(s => s.id === sessionId)
