@@ -39,6 +39,14 @@
               Workspace
             </NuxtLink>
             <NuxtLink
+              v-if="authStore.canManageVMs"
+              to="/vms"
+              class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-colors"
+              active-class="border-blue-500 text-blue-600"
+            >
+              My VMs
+            </NuxtLink>
+            <NuxtLink
               v-if="authStore.isAdmin"
               to="/admin"
               class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-colors"
@@ -132,6 +140,15 @@
             Dashboard
           </NuxtLink>
           
+          <NuxtLink
+            v-if="authStore.canManageVMs"
+            to="/vms"
+            class="border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
+            active-class="bg-blue-50 border-blue-500 text-blue-700"
+          >
+            My VMs
+          </NuxtLink>
+
           <NuxtLink
             to="/labs"
             class="border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"

@@ -108,6 +108,61 @@ export interface GetLabSessionResponse {
   k8s_status: K8sSessionStatus | null
 }
 
+// CPU in thousandths of a core, memory in MiB
+export interface ResourceAmount {
+  cpu_millicores: number
+  memory_mib: number
+}
+
+// GET /labs/{labId}/estimate: what one VM of the lab reserves and stores. `reserved` is what the
+// cluster sets aside; `maximum` is the most the VM may use.
+export interface LabEstimate {
+  persistence: Persistence
+  vm: { vcpus: number, memory_mib: number, disk_gib: number }
+  containers: { name: string, purpose: string, reserved: ResourceAmount, maximum: ResourceAmount }[]
+  total: { reserved: ResourceAmount, maximum: ResourceAmount }
+  devices: Record<string, number>
+  storage: {
+    while_running: { name: string, purpose: string, kind: 'volume' | 'node-local', size_mib: number }[]
+    volumes_mib: number
+    node_local_limit_mib: number
+    after_stop_mib: number
+  }
+}
+
+// The only session option the API accepts today
+export type Persistence = 'none'
+
+// What one VM holds in the cluster. CPU and memory while `running`; storage until it is deleted.
+export interface VMUsage extends ResourceAmount {
+  running: boolean
+  storage_mib: number
+}
+
+export interface UsageTotal extends ResourceAmount {
+  vms: number
+  running_vms: number
+  storage_mib: number
+}
+
+// GET /lab-sessions/usage: the caller's VMs per lab (an admin gets everyone's)
+export interface UsageReport {
+  labs: {
+    lab_id: string
+    lab_name: string
+    vms: {
+      session_id: string
+      user_id: string
+      status: LabSessionStatus
+      phase?: string
+      created_at: string
+      usage: VMUsage | null // null until the controller has reported it
+    }[]
+    total: UsageTotal
+  }[]
+  total: UsageTotal
+}
+
 export interface ListLabSessionsParams {
   status?: LabSessionStatus
   lab_id?: string
@@ -128,9 +183,13 @@ export const useLabsApi = () => {
       api<{ message: string, lab: Lab }>(`/labs/${labId}`, { method: 'PUT', body }),
     deleteLab: (labId: string) =>
       api<{ message: string }>(`/labs/${labId}`, { method: 'DELETE' }),
+    getLabEstimate: (labId: string, persistence: Persistence = 'none') =>
+      api<{ lab_id: string, estimate: LabEstimate }>(`/labs/${labId}/estimate`, { query: { persistence } }),
 
     listLabSessions: (params: ListLabSessionsParams = {}) =>
       api<{ sessions: LabSession[] }>('/lab-sessions/', { query: params }),
+    getUsage: () =>
+      api<UsageReport>('/lab-sessions/usage'),
     getLabSession: (sessionId: string) =>
       api<GetLabSessionResponse>(`/lab-sessions/${sessionId}`),
     createLabSession: (body: CreateLabSessionRequest) =>
