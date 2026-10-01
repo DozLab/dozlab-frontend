@@ -66,8 +66,8 @@
           <!-- Profile dropdown -->
           <div class="relative">
             <button
-              @click="showUserMenu = !showUserMenu"
               class="bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              @click="showUserMenu = !showUserMenu"
             >
               <span class="sr-only">Open user menu</span>
               <div class="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
@@ -96,8 +96,8 @@
               </NuxtLink>
               
               <button
-                @click="handleLogout"
                 class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                @click="handleLogout"
               >
                 Sign out
               </button>
@@ -108,8 +108,8 @@
         <!-- Mobile menu button -->
         <div class="sm:hidden flex items-center">
           <button
-            @click="showMobileMenu = !showMobileMenu"
             class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+            @click="showMobileMenu = !showMobileMenu"
           >
             <span class="sr-only">Open main menu</span>
             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -174,8 +174,8 @@
             </NuxtLink>
             
             <button
-              @click="handleLogout"
               class="block w-full text-left px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
+              @click="handleLogout"
             >
               Sign out
             </button>
@@ -189,7 +189,6 @@
 <script setup lang="ts">
 const authStore = useAuthStore()
 const labsStore = useLabsStore()
-const router = useRouter()
 
 const showUserMenu = ref(false)
 const showMobileMenu = ref(false)

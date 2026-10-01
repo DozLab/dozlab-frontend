@@ -51,16 +51,14 @@
 </template>
 
 <script setup lang="ts">
-interface SessionResponse {
-  session: { id: string, status: string, lab?: { name: string } }
-  k8s_status: { phase: string, message: string, endpoints?: Record<string, string> } | null
-}
+// Not auto-imported: only the store itself (useLabsStore) is
+import { useLabsApi, type LabSession } from '~/stores/labs'
 
 const route = useRoute()
-const api = useApi()
+const labsApi = useLabsApi()
 const sessionId = route.params.id as string
 
-const session = ref<SessionResponse['session'] | null>(null)
+const session = ref<LabSession | null>(null)
 const phase = ref('')
 const message = ref('')
 const endpoints = ref<Record<string, string>>({})
@@ -72,7 +70,7 @@ let timer: ReturnType<typeof setInterval> | undefined
 
 const load = async () => {
   try {
-    const res = await api<SessionResponse>(`/lab-sessions/${sessionId}`)
+    const res = await labsApi.getLabSession(sessionId)
     session.value = res.session
     phase.value = res.k8s_status?.phase || res.session.status
     message.value = res.k8s_status?.message || ''

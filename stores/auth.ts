@@ -54,8 +54,6 @@ export const useAuthStore = defineStore('auth', {
         tokenCookie.value = this.token
         
         return response
-      } catch (error) {
-        throw error
       } finally {
         this.isLoading = false
       }
@@ -76,8 +74,6 @@ export const useAuthStore = defineStore('auth', {
         })
         
         return response
-      } catch (error) {
-        throw error
       } finally {
         this.isLoading = false
       }
@@ -104,7 +100,7 @@ export const useAuthStore = defineStore('auth', {
 
         this.user = user
         this.isAuthenticated = true
-      } catch (error) {
+      } catch {
         // Token might be invalid, logout
         await this.logout()
       }

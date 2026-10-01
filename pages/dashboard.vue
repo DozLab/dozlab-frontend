@@ -60,7 +60,7 @@
             <p class="text-gray-600">Active Sessions</p>
           </div>
         </div>
-        <div class="mt-4" v-if="labsStore.activeSessions[0]">
+        <div v-if="labsStore.activeSessions[0]" class="mt-4">
           <NuxtLink 
             :to="`/workspace/${labsStore.activeSessions[0].id}`" 
             class="text-yellow-600 hover:text-yellow-500 font-medium"
@@ -68,7 +68,7 @@
             Resume Session →
           </NuxtLink>
         </div>
-        <div class="mt-4" v-else>
+        <div v-else class="mt-4">
           <span class="text-gray-500">No active sessions</span>
         </div>
       </div>
@@ -123,7 +123,7 @@
                 <p class="text-sm text-gray-500">{{ lab.category }} • {{ lab.difficulty }}</p>
                 <div class="mt-2">
                   <div class="w-full bg-gray-200 rounded-full h-2">
-                    <div class="bg-blue-600 h-2 rounded-full" :style="`width: ${lab.progress || 0}%`"></div>
+                    <div class="bg-blue-600 h-2 rounded-full" :style="`width: ${lab.progress || 0}%`"/>
                   </div>
                   <p class="text-xs text-gray-500 mt-1">{{ lab.progress || 0 }}% complete</p>
                 </div>
@@ -131,8 +131,8 @@
               
               <div class="ml-4">
                 <button 
-                  @click="continueLabSession(lab)"
                   class="btn-primary"
+                  @click="continueLabSession(lab)"
                 >
                   Continue
                 </button>
@@ -202,7 +202,7 @@
                   <div 
                     class="bg-blue-600 h-2 rounded-full" 
                     :style="`width: ${(category.completed / category.total * 100)}%`"
-                  ></div>
+                  />
                 </div>
               </div>
             </div>
@@ -214,7 +214,7 @@
           <h3 class="text-sm font-medium text-gray-700 mb-3">Recent Activity</h3>
           <div class="space-y-3">
             <div v-for="activity in recentActivity.slice(0, 5)" :key="activity.id" class="flex items-center text-sm">
-              <div class="h-2 w-2 bg-green-500 rounded-full mr-3"></div>
+              <div class="h-2 w-2 bg-green-500 rounded-full mr-3"/>
               <span class="text-gray-600">{{ activity.description }}</span>
             </div>
           </div>
@@ -315,10 +315,10 @@ const completionPercentage = computed(() => {
   return Math.round((completedLabsCount.value / labsStore.labs.length) * 100)
 })
 
-const continueLabSession = async (lab: any) => {
+const continueLabSession = async (lab: { id: string }) => {
   try {
     // Check if there's an existing session for this lab
-    const existingSession = labsStore.sessions.find(s => s.labId === lab.id && s.status === 'running')
+    const existingSession = labsStore.sessions.find(s => s.lab_id === lab.id && s.status === 'running')
     
     if (existingSession) {
       await navigateTo(`/workspace/${existingSession.id}`)
