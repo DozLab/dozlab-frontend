@@ -29,19 +29,25 @@
         >
           Open VS Code
         </a>
-        <a
+        <button
           v-if="endpoints.terminal"
-          :href="endpoints.terminal"
-          target="_blank"
-          rel="noopener"
           class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 font-medium hover:bg-gray-50"
+          @click="showTerminal = !showTerminal"
         >
-          Open terminal
-        </a>
+          {{ showTerminal ? 'Close terminal' : 'Open terminal' }}
+        </button>
         <span v-if="!endpoints.vscode && !error" class="text-gray-500">
           Waiting for the lab to start…
         </span>
       </div>
+
+      <!-- On this page, unlike VS Code: the terminal is only a WebSocket, with no page of its own -->
+      <SessionTerminal
+        v-if="showTerminal && endpoints.terminal"
+        class="mt-6"
+        :endpoint="endpoints.terminal"
+        :session-id="sessionId"
+      />
 
       <p v-if="password" class="mt-4 text-sm text-gray-600">
         VS Code password: <code class="bg-gray-100 px-1 rounded">{{ password }}</code>
@@ -63,6 +69,7 @@ const phase = ref('')
 const message = ref('')
 const endpoints = ref<Record<string, string>>({})
 const error = ref('')
+const showTerminal = ref(false)
 // Only known right after creating the session (the API returns it once)
 const password = useState<string>(`vscode-password-${sessionId}`)
 
