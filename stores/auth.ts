@@ -4,7 +4,7 @@ export interface User {
   id: string
   username: string
   email: string
-  role: 'admin' | 'tutor' | 'student'
+  role: 'admin' | 'instructor' | 'student'
   firstName?: string
   lastName?: string
 }
@@ -26,7 +26,10 @@ export const useAuthStore = defineStore('auth', {
 
   getters: {
     isAdmin: (state) => state.user?.role === 'admin',
-    isTutor: (state) => state.user?.role === 'tutor',
+    isInstructor: (state) => state.user?.role === 'instructor',
+    // Instructors and admins create VMs and see what they use (the API's sessions:usage and
+    // labs:estimate permissions)
+    canManageVMs: (state) => state.user?.role === 'admin' || state.user?.role === 'instructor',
     isStudent: (state) => state.user?.role === 'student',
     fullName: (state) => {
       if (state.user?.firstName && state.user?.lastName) {
