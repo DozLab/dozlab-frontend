@@ -25,7 +25,7 @@
             required
             class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             placeholder="Enter your email address"
-          />
+          >
         </div>
 
         <div>
@@ -37,8 +37,8 @@
             <span v-if="!isLoading">Send Reset Link</span>
             <span v-else class="flex items-center">
               <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
               </svg>
               Sending...
             </span>
@@ -55,7 +55,7 @@
       <div v-if="success" class="mt-8 text-center space-y-4">
         <div class="mx-auto h-16 w-16 bg-green-100 rounded-full flex items-center justify-center">
           <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
           </svg>
         </div>
         <div>
@@ -65,7 +65,7 @@
           </p>
           <p class="mt-2 text-sm text-gray-500">
             Didn't receive the email? Check your spam folder or 
-            <button @click="handleReset" class="text-blue-600 hover:text-blue-500 underline">
+            <button class="text-blue-600 hover:text-blue-500 underline" @click="handleReset">
               try again
             </button>
           </p>
@@ -113,8 +113,8 @@ const handleReset = async () => {
     })
     
     success.value = true
-  } catch (err: any) {
-    error.value = err.message || 'Failed to send reset email'
+  } catch (err) {
+    error.value = (err as Error).message || 'Failed to send reset email'
   } finally {
     isLoading.value = false
   }

@@ -1,10 +1,10 @@
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   data: T
   message?: string
   status: 'success' | 'error'
 }
 
-export interface PaginatedResponse<T = any> {
+export interface PaginatedResponse<T = unknown> {
   data: T[]
   total: number
   page: number
@@ -15,7 +15,7 @@ export interface PaginatedResponse<T = any> {
 
 export interface WebSocketMessage {
   type: string
-  data: any
+  data: unknown
   timestamp: string
 }
 
