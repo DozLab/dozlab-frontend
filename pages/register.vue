@@ -86,7 +86,9 @@
         At least 6 characters.
       </p>
 
-      <label class="flex items-start gap-2 text-sm">
+      <!-- Hidden until the Terms of Service and Privacy Policy pages exist (composables/pages.ts):
+           nobody should have to agree to pages they can't read -->
+      <label v-if="pageReady.terms" class="flex items-start gap-2 text-sm">
         <input
           id="terms"
           v-model="form.acceptTerms"
@@ -97,7 +99,6 @@
         >
         <span>
           I agree to the
-          <!-- Greyed out until the pages exist (composables/pages.ts) -->
           <ReadyLink to="/terms" :ready="pageReady.terms" class="underline hover:text-brand">Terms of Service</ReadyLink>
           and
           <ReadyLink to="/privacy" :ready="pageReady.terms" class="underline hover:text-brand">Privacy Policy</ReadyLink>
@@ -163,7 +164,8 @@ const handleRegister = async () => {
     return
   }
 
-  if (!form.acceptTerms) {
+  // Only asked while the terms pages exist
+  if (pageReady.terms && !form.acceptTerms) {
     error.value = 'You must accept the terms of service'
     return
   }

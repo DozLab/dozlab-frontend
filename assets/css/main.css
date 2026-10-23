@@ -23,6 +23,7 @@
   --color-ink: var(--lx-ink);
   --color-subtle: var(--lx-subtle);
   --color-line: var(--lx-line);
+  --color-field: var(--lx-field);
   --color-brand: var(--lx-brand);
   --color-brand-soft: var(--lx-brand-soft);
   --color-on-brand: var(--lx-on-brand);
@@ -47,6 +48,9 @@
   --lx-ok: oklch(0.5 0.12 155);
   --lx-ok-soft: oklch(0.96 0.03 155);
   --lx-chrome: oklch(1 0 0 / 0.72);
+  --lx-blur: blur(20px) saturate(180%);
+  /* Borders that mark a control, not decoration: at least 3:1 against the page */
+  --lx-field: oklch(0.62 0.01 265);
 }
 
 .dark {
@@ -63,6 +67,7 @@
   --lx-ok: oklch(0.75 0.13 155);
   --lx-ok-soft: oklch(0.25 0.05 155);
   --lx-chrome: oklch(0.16 0.008 265 / 0.7);
+  --lx-field: oklch(0.56 0.01 265);
 }
 
 @layer base {
@@ -181,7 +186,7 @@
     color: var(--lx-on-brand);
   }
   .btn-secondary {
-    border-color: var(--lx-line);
+    border-color: var(--lx-field);
     color: var(--lx-ink);
   }
   .btn-secondary:hover:not(:disabled) {
@@ -220,7 +225,7 @@
     width: 100%;
     min-height: 2.75rem;
     padding: 0.5rem 0.75rem;
-    border: 1px solid var(--lx-line);
+    border: 1px solid var(--lx-field);
     border-radius: 0.25rem;
     background: var(--lx-paper);
     color: var(--lx-ink);
@@ -312,8 +317,8 @@
   /* Frosted chrome: content scrolls under it */
   .lx-chrome {
     background: var(--lx-chrome);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: var(--lx-blur);
+    backdrop-filter: var(--lx-blur);
   }
 
   /* Popover menus open from their button and settle without overshoot */
@@ -369,8 +374,7 @@
 @media (prefers-reduced-transparency: reduce) {
   .lx-chrome {
     background: var(--lx-paper);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+    --lx-blur: none;
   }
 }
 

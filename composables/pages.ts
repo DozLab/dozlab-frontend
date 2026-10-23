@@ -7,7 +7,7 @@ export const pageReady = {
   profile: false, // pages/profile.vue is only a heading
   admin: false, // there is no pages/admin.vue
   forgotPassword: false, // the API has no password reset route
-  terms: false, // there are no Terms of Service or Privacy Policy pages
+  terms: false, // no Terms of Service or Privacy Policy pages: the register checkbox is hidden, not greyed
   notifications: false // the header's bell: there are no notifications yet
 } as const
 

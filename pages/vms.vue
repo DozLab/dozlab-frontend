@@ -62,7 +62,7 @@
               <div class="grid gap-3 sm:grid-cols-2">
                 <label
                   class="flex cursor-pointer items-start gap-3 rounded border p-4 transition-colors"
-                  :class="persistence === 'none' ? 'border-ink' : 'border-line hover:border-subtle'"
+                  :class="persistence === 'none' ? 'border-ink' : 'border-field hover:border-ink'"
                 >
                   <input v-model="persistence" type="radio" value="none" class="mt-1">
                   <span>
@@ -191,7 +191,42 @@
                 {{ formatAmount(lab.total) }} · {{ formatMiB(lab.total.storage_mib) }} storage
               </p>
 
-              <div class="mt-4 overflow-x-auto">
+              <!-- Phones: one stacked card per VM, so Open and Delete are always in view -->
+              <ul class="mt-4 border-t border-line sm:hidden">
+                <li v-for="vm in lab.vms" :key="vm.session_id" class="border-b border-line py-4">
+                  <div class="flex items-center justify-between gap-3">
+                    <span class="chip" :class="vm.usage?.running ? 'chip-live' : ''">
+                      {{ vm.phase || vm.status }}
+                    </span>
+                    <span class="text-sm text-subtle">{{ formatDate(vm.created_at) }}</span>
+                  </div>
+                  <dl class="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 text-sm tabular-nums">
+                    <dt class="text-subtle">
+                      Reserved
+                    </dt>
+                    <dd>{{ vm.usage ? (vm.usage.running ? formatAmount(vm.usage) : 'nothing') : 'not reported yet' }}</dd>
+                    <dt class="text-subtle">
+                      Storage
+                    </dt>
+                    <dd>{{ vm.usage ? formatMiB(vm.usage.storage_mib) : '–' }}</dd>
+                  </dl>
+                  <VmActions
+                    class="mt-4"
+                    stacked
+                    :session-id="vm.session_id"
+                    :lab-name="lab.lab_name"
+                    :running="!!vm.usage?.running"
+                    :confirming="confirming === vm.session_id"
+                    :stopping="stopping === vm.session_id"
+                    :error="deleteErrors[vm.session_id]"
+                    @ask="confirming = vm.session_id"
+                    @cancel="confirming = ''"
+                    @confirm="stopVM(vm.session_id)"
+                  />
+                </li>
+              </ul>
+
+              <div class="mt-4 hidden overflow-x-auto sm:block">
                 <table class="lx-table">
                   <thead>
                     <tr>
@@ -199,7 +234,7 @@
                       <th>Reserved</th>
                       <th>Storage</th>
                       <th>Created</th>
-                      <th><span class="sr-only">Actions</span></th>
+                      <th aria-label="Actions" />
                     </tr>
                   </thead>
                   <tbody>
@@ -218,17 +253,18 @@
                       <td class="whitespace-nowrap text-subtle">
                         {{ formatDate(vm.created_at) }}
                       </td>
-                      <td class="whitespace-nowrap text-right">
-                        <NuxtLink :to="`/workspace/${vm.session_id}`" class="lx-link">
-                          Open →
-                        </NuxtLink>
-                        <button
-                          class="btn-danger ml-2 min-h-9"
-                          :disabled="stopping === vm.session_id"
-                          @click="stopVM(vm.session_id)"
-                        >
-                          {{ stopping === vm.session_id ? 'Deleting…' : 'Delete' }}
-                        </button>
+                      <td class="!pr-0">
+                        <VmActions
+                          :session-id="vm.session_id"
+                          :lab-name="lab.lab_name"
+                          :running="!!vm.usage?.running"
+                          :confirming="confirming === vm.session_id"
+                          :stopping="stopping === vm.session_id"
+                          :error="deleteErrors[vm.session_id]"
+                          @ask="confirming = vm.session_id"
+                          @cancel="confirming = ''"
+                          @confirm="stopVM(vm.session_id)"
+                        />
                       </td>
                     </tr>
                   </tbody>
@@ -270,6 +306,9 @@ const createError = ref('')
 const usage = ref<UsageReport | null>(null)
 const usageError = ref('')
 const stopping = ref('')
+// The VM whose Delete is waiting for a yes, and delete errors per VM
+const confirming = ref('')
+const deleteErrors = ref<Record<string, string>>({})
 
 // The API's own message when it gives one
 const messageOf = (err: unknown, fallback: string) => {
@@ -335,12 +374,15 @@ const createVM = async () => {
 }
 
 const stopVM = async (sessionId: string) => {
+  confirming.value = ''
   stopping.value = sessionId
+  deleteErrors.value = { ...deleteErrors.value, [sessionId]: '' }
   try {
     await labsStore.stopSession(sessionId)
     await loadUsage()
   } catch (err) {
-    usageError.value = messageOf(err, 'Failed to delete the VM')
+    // Shown on that VM's row; the rest of the list stays
+    deleteErrors.value[sessionId] = messageOf(err, 'Failed to delete the VM')
   } finally {
     stopping.value = ''
   }
