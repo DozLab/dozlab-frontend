@@ -1,16 +1,22 @@
 <template>
-  <div>
-    <div class="flex items-center justify-between text-sm text-gray-600">
-      <span>Terminal: {{ state }}</span>
+  <div class="overflow-hidden rounded border border-line bg-[#0b0d12]">
+    <div class="flex items-center justify-between border-b border-white/10 px-4 py-2 text-[0.8125rem] text-white/60">
+      <span class="flex items-center gap-2">
+        <span
+          class="size-1.5 rounded-full"
+          :class="state === 'connected' ? 'bg-emerald-400' : state === 'connecting' ? 'animate-pulse bg-amber-300' : 'bg-red-400'"
+        />
+        Terminal: {{ state }}
+      </span>
       <button
         v-if="state === 'disconnected'"
-        class="text-blue-600 hover:text-blue-500 font-medium"
+        class="font-medium text-white hover:text-[#8fb3ee]"
         @click="connect"
       >
         Reconnect
       </button>
     </div>
-    <div ref="el" class="mt-2 h-96 rounded-md bg-black p-2" />
+    <div ref="el" class="h-[28rem] p-3" />
   </div>
 </template>
 
@@ -25,7 +31,12 @@ const props = defineProps<{ endpoint: string, sessionId: string }>()
 const el = ref<HTMLElement | null>(null)
 const state = ref<'connecting' | 'connected' | 'disconnected'>('connecting')
 
-const term = new Terminal({ cursorBlink: true, fontSize: 14 })
+const term = new Terminal({
+  cursorBlink: true,
+  fontSize: 14,
+  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+  theme: { background: '#0b0d12', cursor: '#8fb3ee', selectionBackground: '#4f83dd55' }
+})
 const fit = new FitAddon()
 term.loadAddon(fit)
 
