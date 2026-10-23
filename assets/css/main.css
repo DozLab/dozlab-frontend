@@ -1,28 +1,386 @@
-/* Tailwind 4 (from @nuxt/ui 3); @config keeps the colors and fonts in tailwind.config.js */
+/* Tailwind 4 (from @nuxt/ui 3). The look follows the portfolio's Lexington restyle
+   (white page, near-black ink, one blue accent #4f83dd, Switzer, thin rules, small radius)
+   with Apple-style details: a frosted header, feedback on press, size-aware tracking,
+   and gentler fallbacks for reduced motion, transparency and higher contrast. */
 @import "tailwindcss";
 @import "@nuxt/ui";
-@config "../../tailwind.config.js";
+
+/* Switzer (Fontshare, ITF Free Font License), self-hosted like the portfolio */
+@font-face {
+  font-family: 'Switzer';
+  src: url('../fonts/Switzer-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Colors are named so they don't collide with Nuxt UI's primary/neutral scales */
+@theme inline {
+  --font-sans: 'Switzer', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --color-paper: var(--lx-paper);
+  --color-surface: var(--lx-surface);
+  --color-ink: var(--lx-ink);
+  --color-subtle: var(--lx-subtle);
+  --color-line: var(--lx-line);
+  --color-brand: var(--lx-brand);
+  --color-brand-soft: var(--lx-brand-soft);
+  --color-on-brand: var(--lx-on-brand);
+  --color-danger: var(--lx-danger);
+  --color-danger-soft: var(--lx-danger-soft);
+  --color-ok: var(--lx-ok);
+  --color-ok-soft: var(--lx-ok-soft);
+}
+
+/* Text-sized blue is a darker step of #4f83dd so it passes contrast on white */
+:root {
+  --lx-paper: oklch(1 0 0);
+  --lx-surface: oklch(0.982 0.003 265);
+  --lx-ink: oklch(0.18 0.008 265);
+  --lx-subtle: oklch(0.5 0.01 265);
+  --lx-line: oklch(0.91 0.004 265);
+  --lx-brand: oklch(0.53 0.16 262);
+  --lx-brand-soft: oklch(0.955 0.012 262);
+  --lx-on-brand: oklch(0.99 0 0);
+  --lx-danger: oklch(0.55 0.19 27);
+  --lx-danger-soft: oklch(0.96 0.02 27);
+  --lx-ok: oklch(0.5 0.12 155);
+  --lx-ok-soft: oklch(0.96 0.03 155);
+  --lx-chrome: oklch(1 0 0 / 0.72);
+}
+
+.dark {
+  --lx-paper: oklch(0.16 0.008 265);
+  --lx-surface: oklch(0.19 0.009 265);
+  --lx-ink: oklch(0.96 0.003 265);
+  --lx-subtle: oklch(0.7 0.01 265);
+  --lx-line: oklch(0.96 0.003 265 / 12%);
+  --lx-brand: oklch(0.72 0.12 262);
+  --lx-brand-soft: oklch(0.25 0.03 262);
+  --lx-on-brand: oklch(0.16 0.008 265);
+  --lx-danger: oklch(0.7 0.16 27);
+  --lx-danger-soft: oklch(0.25 0.05 27);
+  --lx-ok: oklch(0.75 0.13 155);
+  --lx-ok-soft: oklch(0.25 0.05 155);
+  --lx-chrome: oklch(0.16 0.008 265 / 0.7);
+}
 
 @layer base {
+  html {
+    color-scheme: light;
+    accent-color: var(--lx-brand);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
   body {
-    @apply bg-gray-50 text-gray-900;
+    background: var(--lx-paper);
+    color: var(--lx-ink);
+    overflow-x: clip;
+  }
+  ::selection {
+    background: color-mix(in oklch, var(--lx-brand) 28%, transparent);
+  }
+  :focus-visible {
+    outline: 2px solid var(--lx-brand);
+    outline-offset: 2px;
+  }
+  a {
+    text-underline-offset: 3px;
   }
 }
 
+/* One width and side gutter for every page */
+@utility page-frame {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 1440px;
+  padding-inline: 1rem;
+  @media (width >= 40rem) {
+    padding-inline: 2rem;
+  }
+  @media (width >= 64rem) {
+    padding-inline: 3rem;
+  }
+}
+
+/* Big editorial headings: tight tracking and leading, which large type needs */
+@utility display {
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 0.95;
+  text-wrap: balance;
+}
+
 @layer components {
+  /* The grey "(Section)" marker in the left column */
+  .lx-label {
+    font-size: 0.875rem;
+    color: var(--lx-subtle);
+  }
+  .lx-label::before { content: '('; }
+  .lx-label::after { content: ')'; }
+
+  /* A page section: label in the left four columns, content in the right eight */
+  .lx-section {
+    display: grid;
+    row-gap: 1.5rem;
+    border-top: 1px solid var(--lx-line);
+    padding-block: 2.5rem;
+    @media (width >= 48rem) {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: 2rem;
+      padding-block: 3.5rem;
+    }
+  }
+  .lx-section > .lx-label {
+    @media (width >= 48rem) { grid-column: span 4 / span 4; }
+  }
+  .lx-section > .lx-body {
+    min-width: 0;
+    @media (width >= 48rem) { grid-column: span 8 / span 8; }
+  }
+
+  /* Buttons: 44px tall for touch, feedback the moment they're pressed */
+  .btn,
+  .btn-primary,
+  .btn-secondary,
+  .btn-danger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding-inline: 1.125rem;
+    border-radius: 0.25rem;
+    border: 1px solid transparent;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease,
+      transform 100ms ease-out;
+  }
+  :is(.btn, .btn-primary, .btn-secondary, .btn-danger):active:not(:disabled) {
+    transform: scale(0.97);
+  }
+  :is(.btn, .btn-primary, .btn-secondary, .btn-danger):disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
   .btn-primary {
-    @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors;
+    background: var(--lx-ink);
+    color: var(--lx-paper);
   }
-  
+  .btn-primary:hover:not(:disabled) {
+    background: var(--lx-brand);
+    color: var(--lx-on-brand);
+  }
   .btn-secondary {
-    @apply bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium py-2 px-4 rounded-md transition-colors;
+    border-color: var(--lx-line);
+    color: var(--lx-ink);
   }
-  
+  .btn-secondary:hover:not(:disabled) {
+    border-color: var(--lx-ink);
+  }
+  .btn-danger {
+    color: var(--lx-danger);
+    padding-inline: 0.5rem;
+  }
+  .btn-danger:hover:not(:disabled) {
+    background: var(--lx-danger-soft);
+  }
+
+  /* Text links: ink with an arrow, blue on hover, as on the portfolio */
+  .lx-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-weight: 500;
+    color: var(--lx-ink);
+    transition: color 150ms ease;
+  }
+  .lx-link:hover {
+    color: var(--lx-brand);
+  }
+
+  /* Form fields with visible labels */
+  .field-label {
+    display: block;
+    font-size: 0.8125rem;
+    color: var(--lx-subtle);
+    margin-bottom: 0.375rem;
+  }
   .input-field {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500;
+    display: block;
+    width: 100%;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--lx-line);
+    border-radius: 0.25rem;
+    background: var(--lx-paper);
+    color: var(--lx-ink);
+    font-size: 1rem;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
   }
-  
-  .card {
-    @apply bg-white rounded-lg shadow-md p-6;
+  .input-field::placeholder {
+    color: var(--lx-subtle);
+    opacity: 0.7;
+  }
+  .input-field:focus {
+    outline: none;
+    border-color: var(--lx-brand);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--lx-brand) 22%, transparent);
+  }
+
+  /* Messages: status, success, error */
+  .notice,
+  .notice-error,
+  .notice-ok {
+    padding: 0.75rem 1rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    border-left: 2px solid currentColor;
+  }
+  .notice-error {
+    background: var(--lx-danger-soft);
+    color: var(--lx-danger);
+  }
+  .notice-ok {
+    background: var(--lx-ok-soft);
+    color: var(--lx-ok);
+  }
+
+  /* Small state chip with a dot */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: var(--lx-surface);
+    color: var(--lx-subtle);
+    border: 1px solid var(--lx-line);
+  }
+  .chip::before {
+    content: '';
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 999px;
+    background: currentColor;
+  }
+  .chip-live {
+    background: var(--lx-ok-soft);
+    color: var(--lx-ok);
+    border-color: transparent;
+  }
+  .chip-wait::before {
+    animation: lx-pulse 1.6s ease-in-out infinite;
+  }
+  .chip-error {
+    background: var(--lx-danger-soft);
+    color: var(--lx-danger);
+    border-color: transparent;
+  }
+
+  /* Tables with thin rules and no boxes */
+  .lx-table {
+    width: 100%;
+    font-size: 0.875rem;
+    border-collapse: collapse;
+  }
+  .lx-table th {
+    text-align: left;
+    font-weight: 400;
+    font-size: 0.8125rem;
+    color: var(--lx-subtle);
+    padding: 0.5rem 1rem 0.5rem 0;
+    border-bottom: 1px solid var(--lx-line);
+  }
+  .lx-table td {
+    padding: 0.75rem 1rem 0.75rem 0;
+    border-bottom: 1px solid var(--lx-line);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Frosted chrome: content scrolls under it */
+  .lx-chrome {
+    background: var(--lx-chrome);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+  }
+
+  /* Popover menus open from their button and settle without overshoot */
+  .lx-pop-enter-active,
+  .lx-pop-leave-active {
+    transition: opacity 160ms ease, transform 220ms cubic-bezier(0.2, 0.9, 0.3, 1);
+  }
+  .lx-pop-enter-from,
+  .lx-pop-leave-to {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+
+  /* Headings rise in on first paint */
+  .lx-rise {
+    animation: lx-rise 700ms cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  }
+  .lx-rise-2 {
+    animation-delay: 80ms;
+  }
+  .lx-rise-3 {
+    animation-delay: 160ms;
+  }
+}
+
+@keyframes lx-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.5em);
+  }
+}
+
+@keyframes lx-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lx-rise,
+  .chip-wait::before {
+    animation: none;
+  }
+  :is(.btn, .btn-primary, .btn-secondary, .btn-danger):active:not(:disabled) {
+    transform: none;
+  }
+  .lx-pop-enter-from,
+  .lx-pop-leave-to {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .lx-chrome {
+    background: var(--lx-paper);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --lx-line: oklch(0.6 0.01 265);
+    --lx-subtle: oklch(0.38 0.01 265);
+  }
+  .lx-chrome {
+    background: var(--lx-paper);
+    border-bottom: 1px solid var(--lx-ink);
   }
 }

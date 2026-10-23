@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-paper text-ink">
     <LayoutHeader />
-    <main class="flex-1">
+    <main class="flex-1 pb-24">
       <slot />
     </main>
   </div>
@@ -14,7 +14,7 @@ const authStore = useAuthStore()
 
 onMounted(async () => {
   await authStore.initializeAuth()
-  
+
   if (!authStore.isAuthenticated) {
     await navigateTo('/login')
   }
